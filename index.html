@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RETRO TERMINAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --phosphor: #33ff66;
+      --phosphor-dim: #1a8f3a;
+      --amber: #ffb000;
+      --bg: #050a05;
+      --bezel: #2b2620;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: radial-gradient(circle at center, #3a332a 0%, #14110d 100%);
+      font-family: "VT323", "Courier New", monospace;
+    }
+    /* 모니터 외곽 베젤 */
+    .monitor {
+      width: 100%;
+      max-width: 640px;
+      padding: 28px;
+      background: linear-gradient(145deg, #d8cfb8, #a89f88);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.6), inset 0 2px 4px rgba(255,255,255,.5);
+    }
+    .brand {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+      color: #5a5244;
+    }
+    .led {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--phosphor);
+      box-shadow: 0 0 8px var(--phosphor);
+    }
+    /* CRT 화면 */
+    .screen {
+      position: relative;
+      overflow: hidden;
+      min-height: 360px;
+      padding: 24px;
+      background: var(--bg);
+      border-radius: 18px / 24px;
+      border: 6px solid var(--bezel);
+      box-shadow: inset 0 0 60px rgba(51,255,102,.15), inset 0 0 12px #000;
+      color: var(--phosphor);
+      text-shadow: 0 0 4px var(--phosphor), 0 0 10px rgba(51,255,102,.5);
+      animation: flicker 4s infinite;
+    }
+    /* 주사선 */
+    .screen::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.35) 2px 4px);
+      pointer-events: none;
+      z-index: 2;
+    }
+    /* 화면 가장자리 비네팅 */
+    .screen::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.7) 100%);
+      pointer-events: none;
+      z-index: 3;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: .85; }
+      94% { opacity: 1; }
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 18px;
+      color: var(--amber);
+      text-shadow: 0 0 6px var(--amber);
+      letter-spacing: 2px;
+    }
+    .sub { margin: 0 0 20px; font-size: 20px; color: var(--phosphor-dim); }
+    .prompt-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 24px;
+    }
+    .prompt-row label { white-space: nowrap; }
+    input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      border-bottom: 2px dashed var(--phosphor-dim);
+      color: var(--phosphor);
+      font: inherit;
+      text-shadow: inherit;
+      caret-color: var(--phosphor);
+      outline: none;
+      padding: 2px 4px;
+    }
+    input::placeholder { color: var(--phosphor-dim); }
+    button {
+      font-family: "Press Start 2P", monospace;
+      font-size: 11px;
+      padding: 10px 14px;
+      background: var(--phosphor);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--phosphor-dim);
+      text-shadow: none;
+    }
+    button:hover { background: var(--amber); box-shadow: 4px 4px 0 #8a5f00; }
+    button:active { transform: translate(4px, 4px); box-shadow: none; }
+    #output {
+      margin-top: 28px;
+      font-size: 30px;
+      line-height: 1.3;
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 1.3em;
+    }
+    /* 깜빡이는 블록 커서 */
+    #output::after {
+      content: "█";
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    @media (max-width: 480px) {
+      .monitor { padding: 14px; }
+      .screen { padding: 16px; min-height: 300px; }
+      h1 { font-size: 13px; }
+      .prompt-row { flex-wrap: wrap; font-size: 20px; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="monitor">
+    <div class="screen">
+      <h1>RETRO-TERM 1984</h1>
+      <p class="sub">READY. 64K RAM SYSTEM  38911 BASIC BYTES FREE</p>
+      <div class="prompt-row">
+        <label for="text-input">C:\&gt;</label>
+        <input id="text-input" type="text" placeholder="TYPE HERE..." autocomplete="off" autofocus>
+        <button id="show-button">RUN</button>
+      </div>
+      <p id="output"></p>
+    </div>
+    <div class="brand">
+      <span>YEDDO SYSTEMS</span>
+      <span class="led"></span>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
